@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Narad</string>
+    <string name="tagline_sovereign">Sovereign Communication for Every Indian Citizen</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_feed">Samvad</string>
+    <string name="tab_videos">Drishya</string>
+    <string name="tab_channels">Vani</string>
+    <string name="tab_vault">Kavach</string>
+    <string name="privacy_charter_title">Zero-Trust Sovereign Privacy</string>
+    <string name="privacy_charter_body">Your private chats, personal vault posts, and identity metadata remain strictly isolated under your ownership. No third party can access private data unless you explicitly grant consent or a verified judicial court order for criminal charges is lawfully logged.</string>
+</resources>

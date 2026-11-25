@@ -1,0 +1,304 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public citizen profile on Narad (strictly free of PII like email or phone)",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID matching document ID" },
+        "displayName": { "type": "string", "description": "Display name (1..60 chars)" },
+        "handle": { "type": "string", "description": "Unique citizen handle (2..40 chars)" },
+        "bio": { "type": "string", "description": "Optional profile bio (<= 250 chars)" },
+        "city": { "type": "string", "description": "Optional Indian city/state (<= 60 chars)" },
+        "avatarIndex": { "type": "integer", "description": "Avatar theme index 0..10" },
+        "discoverable": { "type": "boolean", "description": "Whether other citizens can discover this profile" },
+        "verifiedCitizen": { "type": "boolean", "description": "Verified badge flag" },
+        "followersCount": { "type": "integer", "description": "Follower count" },
+        "postsCount": { "type": "integer", "description": "Post count" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on create" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update" }
+      },
+      "required": ["userId", "displayName", "handle", "discoverable", "verifiedCitizen", "followersCount", "postsCount", "createdAt", "updatedAt"]
+    },
+    "PrivacyVault": {
+      "title": "PrivacyVault",
+      "description": "Owner-only sovereign privacy settings, consent defaults, and isolated PII",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string", "description": "Optional isolated email PII" },
+        "defaultPostVisibility": { "type": "string", "enum": ["PRIVATE", "CONTACTS", "PUBLIC"] },
+        "messagePolicy": { "type": "string", "enum": ["CONTACTS", "EVERYONE"] },
+        "readReceipts": { "type": "boolean" },
+        "onlineStatus": { "type": "boolean" },
+        "disappearingHours": { "type": "integer" },
+        "screenshotGuard": { "type": "boolean" },
+        "dataResidencyRegion": { "type": "string" },
+        "warrantLockAccepted": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "defaultPostVisibility", "messagePolicy", "readReceipts", "onlineStatus", "disappearingHours", "screenshotGuard", "dataResidencyRegion", "warrantLockAccepted", "createdAt", "updatedAt"]
+    },
+    "ConsentGrant": {
+      "title": "ConsentGrant",
+      "description": "Explicit user-granted access permission that can be revoked anytime",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "granteeName": { "type": "string" },
+        "granteeHandle": { "type": "string" },
+        "scope": { "type": "string", "enum": ["PRIVATE_POSTS", "PROFILE_DETAILS", "DIRECT_MEDIA"] },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "granteeName", "granteeHandle", "scope", "active", "createdAt", "updatedAt"]
+    },
+    "PrivacyAuditLog": {
+      "title": "PrivacyAuditLog",
+      "description": "Immutable privacy and consent audit trail owned by the user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "action": { "type": "string" },
+        "detail": { "type": "string" },
+        "category": { "type": "string", "enum": ["CONSENT", "ENCRYPTION", "SECURITY", "WARRANT_CHECK"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "action", "detail", "category", "createdAt"]
+    },
+    "UserSubscription": {
+      "title": "UserSubscription",
+      "description": "Channel subscription owned by user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "channelId": { "type": "string" },
+        "channelName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "channelId", "channelName", "createdAt"]
+    },
+    "ChatThread": {
+      "title": "ChatThread",
+      "description": "WhatsApp/Telegram encrypted direct, group, or secret chat thread",
+      "type": "object",
+      "properties": {
+        "participantUids": { "type": "array" },
+        "title": { "type": "string" },
+        "chatType": { "type": "string", "enum": ["DIRECT", "GROUP", "SECRET"] },
+        "lastMessage": { "type": "string" },
+        "lastSenderUid": { "type": "string" },
+        "disappearingHours": { "type": "integer" },
+        "encryptedFingerprint": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantUids", "title", "chatType", "disappearingHours", "encryptedFingerprint", "createdBy", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Encrypted chat message with denormalized participantUids",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "senderName": { "type": "string" },
+        "participantUids": { "type": "array" },
+        "text": { "type": "string" },
+        "replyToText": { "type": "string" },
+        "mediaTag": { "type": "string" },
+        "reaction": { "type": "string" },
+        "deliveryState": { "type": "string", "enum": ["SENT", "DELIVERED", "READ"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chatId", "senderUid", "senderName", "participantUids", "text", "deliveryState", "createdAt", "updatedAt"]
+    },
+    "SocialPost": {
+      "title": "SocialPost",
+      "description": "Facebook/Instagram style daily activity post or 24h story with owner-controlled visibility",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorHandle": { "type": "string" },
+        "caption": { "type": "string" },
+        "location": { "type": "string" },
+        "postKind": { "type": "string", "enum": ["POST", "STORY"] },
+        "visibility": { "type": "string", "enum": ["PUBLIC", "PRIVATE"] },
+        "mediaPreset": { "type": "string", "enum": ["NONE", "HERITAGE", "SOVEREIGN", "STUDIO"] },
+        "likesCount": { "type": "integer" },
+        "commentsCount": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "authorName", "authorHandle", "caption", "postKind", "visibility", "mediaPreset", "likesCount", "commentsCount", "createdAt", "updatedAt"]
+    },
+    "Channel": {
+      "title": "Channel",
+      "description": "YouTube + Telegram style creator broadcast channel",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string" },
+        "name": { "type": "string" },
+        "handle": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "channelPrivacy": { "type": "string", "enum": ["PUBLIC", "INVITE_ONLY"] },
+        "subscribersCount": { "type": "integer" },
+        "verified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "name", "handle", "description", "category", "channelPrivacy", "subscribersCount", "verified", "createdAt", "updatedAt"]
+    },
+    "ChannelBroadcast": {
+      "title": "ChannelBroadcast",
+      "description": "Telegram-style announcement broadcast inside a channel",
+      "type": "object",
+      "properties": {
+        "channelId": { "type": "string" },
+        "channelOwnerUid": { "type": "string" },
+        "channelPrivacy": { "type": "string", "enum": ["PUBLIC", "INVITE_ONLY"] },
+        "authorUid": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["channelId", "channelOwnerUid", "channelPrivacy", "authorUid", "title", "body", "createdAt"]
+    },
+    "VideoItem": {
+      "title": "VideoItem",
+      "description": "YouTube Shorts or Long-Form video item",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string" },
+        "channelId": { "type": "string" },
+        "channelName": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "videoFormat": { "type": "string", "enum": ["SHORT", "LONG"] },
+        "durationLabel": { "type": "string" },
+        "category": { "type": "string" },
+        "thumbnailPreset": { "type": "string", "enum": ["HERITAGE", "SOVEREIGN", "STUDIO", "BANNER"] },
+        "visibility": { "type": "string", "enum": ["PUBLIC", "PRIVATE"] },
+        "viewsCount": { "type": "integer" },
+        "likesCount": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "channelId", "channelName", "title", "description", "videoFormat", "durationLabel", "category", "thumbnailPreset", "visibility", "viewsCount", "likesCount", "createdAt", "updatedAt"]
+    },
+    "CommentItem": {
+      "title": "CommentItem",
+      "description": "Comment on a social post or video with denormalized visibility metadata",
+      "type": "object",
+      "properties": {
+        "parentId": { "type": "string" },
+        "parentVisibility": { "type": "string", "enum": ["PUBLIC", "PRIVATE"] },
+        "parentOwnerUid": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["parentId", "parentVisibility", "parentOwnerUid", "authorUid", "authorName", "text", "createdAt"]
+    },
+    "ContactItem": {
+      "title": "ContactItem",
+      "description": "Owner-isolated address book contact",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "contactUid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "handle": { "type": "string" },
+        "note": { "type": "string" },
+        "verified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "displayName", "handle", "verified", "createdAt", "updatedAt"]
+    },
+    "InviteRecord": {
+      "title": "InviteRecord",
+      "description": "Tracked user invitation with sovereign invite code",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "inviteCode": { "type": "string" },
+        "channel": { "type": "string" },
+        "status": { "type": "string", "enum": ["SENT", "JOINED"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "recipientName", "inviteCode", "channel", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Discoverable public citizen profiles (PII isolated in private subcollection)"
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/PrivacyVault" },
+      "description": "Owner-only sovereign privacy vault & isolated PII"
+    },
+    "/users/{userId}/consent_grants/{grantId}": {
+      "schema": { "$ref": "#/entities/ConsentGrant" },
+      "description": "Owner-only explicit consent ledger"
+    },
+    "/users/{userId}/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/PrivacyAuditLog" },
+      "description": "Immutable owner-only privacy & warrant-compliance audit trail"
+    },
+    "/users/{userId}/subscriptions/{channelId}": {
+      "schema": { "$ref": "#/entities/UserSubscription" },
+      "description": "User channel subscriptions"
+    },
+    "/users/{userId}/contacts/{contactId}": {
+      "schema": { "$ref": "#/entities/ContactItem" },
+      "description": "Owner-only saved citizen contacts"
+    },
+    "/users/{userId}/invites/{inviteId}": {
+      "schema": { "$ref": "#/entities/InviteRecord" },
+      "description": "Owner-only tracked user invitations"
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/ChatThread" },
+      "description": "Participant-isolated WhatsApp/Telegram chat threads"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Participant-isolated encrypted chat messages"
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/SocialPost" },
+      "description": "Social feed posts and stories with PUBLIC or PRIVATE owner-only visibility"
+    },
+    "/posts/{postId}/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/CommentItem" },
+      "description": "Comments on social posts"
+    },
+    "/channels/{channelId}": {
+      "schema": { "$ref": "#/entities/Channel" },
+      "description": "Creator channels (YouTube + Telegram style)"
+    },
+    "/channels/{channelId}/broadcasts/{broadcastId}": {
+      "schema": { "$ref": "#/entities/ChannelBroadcast" },
+      "description": "Broadcast messages inside creator channels"
+    },
+    "/videos/{videoId}": {
+      "schema": { "$ref": "#/entities/VideoItem" },
+      "description": "Shorts and Long-Form videos"
+    },
+    "/videos/{videoId}/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/CommentItem" },
+      "description": "Comments on videos"
+    }
+  }
+}

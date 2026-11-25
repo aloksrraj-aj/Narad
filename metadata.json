@@ -1,0 +1,6 @@
+{
+  "name": "Narad",
+  "description": "Sovereign Indian super-app combining encrypted messaging, social feed, creator channels, shorts, and long-form video with user-controlled privacy.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
